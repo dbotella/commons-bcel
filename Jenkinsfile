@@ -16,6 +16,7 @@ pipeline {
         stage('Coverity Full Scan') {
             when { not { changeRequest() } }
             steps {
+                sh 'chmod 400 auth-key.txt'
                 synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}-$BRANCH_NAME",
                     coverity_policy_view: 'Outstanding Issues'
             }
@@ -23,6 +24,7 @@ pipeline {
         stage('Coverity PR Scan') {
             when { changeRequest() }
             steps {
+                sh 'chmod 400 auth-key.txt'
                 synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}-$CHANGE_TARGET",
                     coverity_automation_prcomment: true
             }
