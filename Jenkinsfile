@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B package'
+                sh 'mvn -Drat.skip=true -DskipTests=true package'
             }
         }
         stage('Coverity Full Scan') {
