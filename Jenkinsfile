@@ -17,7 +17,7 @@ pipeline {
             when { not { changeRequest() } }
             steps {
                 sh 'chmod 400 auth-key.txt'
-                synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}-$BRANCH_NAME",
+                synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}",
                     coverity_policy_view: 'Outstanding Issues'
             }
         }
@@ -25,7 +25,7 @@ pipeline {
             when { changeRequest() }
             steps {
                 sh 'chmod 400 auth-key.txt'
-                synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}-$CHANGE_TARGET",
+                synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}",
                     coverity_automation_prcomment: true
             }
         }
