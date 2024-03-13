@@ -1,3 +1,7 @@
+/*
+ * https://sig-product-docs.synopsys.com/bundle/bridge/page/documentation/using_synopsys_security_scan_for_coverity.html
+ */
+
 pipeline {
     agent any
     tools {
@@ -16,6 +20,7 @@ pipeline {
         stage('Coverity Full Scan') {
             when { not { changeRequest() } }
             steps {
+                sh 'echo $AUTH_KEY > ./auth-key.txt'
                 sh 'chmod 400 auth-key.txt'
                 synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}",
                     coverity_policy_view: 'Outstanding Issues', coverity_install_directory: '/opt/cov-analysis-linux64-2023.12.0', coverity_local: true
@@ -24,6 +29,7 @@ pipeline {
         stage('Coverity PR Scan') {
             when { changeRequest() }
             steps {
+                sh 'echo $AUTH_KEY > ./auth-key.txt'
                 sh 'chmod 400 auth-key.txt'
                 synopsys_scan product: 'coverity', coverity_project_name: "${env.REPO_NAME}", coverity_stream_name: "${env.REPO_NAME}",
                     coverity_automation_prcomment: true, coverity_install_directory: '/opt/cov-analysis-linux64-2023.12.0', coverity_local: true
