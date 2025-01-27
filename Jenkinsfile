@@ -47,7 +47,7 @@ pipeline {
                     coverity_project_name: "${COVERITY_PROJECT_NAME}",
                     coverity_install_directory: '/opt/cov-analysis-linux64-2024.12.0',
                     coverity_local: true,
-                    coverity.automation.prcomment: true, 
+                    coverity_automation_prcomment: true
 
                     // Uncomment to add custom logic based on return status
                     if (status == 8) { unstable 'policy violation' }
