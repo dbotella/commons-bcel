@@ -1,7 +1,3 @@
-/*
- * https://sig-product-docs.synopsys.com/bundle/bridge/page/documentation/using_synopsys_security_scan_for_coverity.html
- */
-
 pipeline {
     agent any
     tools {
@@ -20,42 +16,43 @@ pipeline {
         stage('Coverity Full Scan') {
             when { not { changeRequest() } }
             steps {
-                 script {
-                def status = security_scan product: "coverity", 
-                    coverity_url: "${COVERITY_URL}", 
-                    coverity_user: "${COVERITY_USER_NAME}", 
-                    coverity_passphrase: "${COVERITY_PASSWORD}", 
-                    coverity_stream_name: "${COVERITY_STREAM_NAME}", 
+                script {
+                    def status = security_scan product: 'coverity',
+                    coverity_url: "${COVERITY_URL}",
+                    coverity_user: "${COVERITY_USER_NAME}",
+                    coverity_passphrase: "${COVERITY_PASSWORD}",
+                    coverity_stream_name: "${COVERITY_STREAM_NAME}",
                     coverity_project_name: "${COVERITY_PROJECT_NAME}",
-                    coverity_install_directory: '/opt/cov-analysis-linux64-2024.12.0', 
-                    coverity_local: true
+                    coverity_install_directory: '/opt/cov-analysis-linux64-2024.12.0',
+                    coverity_local: true, 
+                    coverity_build_command: 'mvn -Drat.skip=true -DskipTests=true package'
+                    coverity_clean_command: 'mvn clean'
                     
+
                     // Uncomment to add custom logic based on return status
-                if (status == 8) { unstable 'policy violation' }
+                    if (status == 8) { unstable 'policy violation' }
                 else if (status != 0) { error 'plugin failure' }
-
-
-            }
-
+                }
             }
         }
         stage('Coverity PR Scan') {
             when { changeRequest() }
             steps {
-                 script {
-                def status = security_scan product: "coverity", 
-                    coverity_url: "${COVERITY_URL}", 
-                    coverity_user: "${COVERITY_USER_NAME}", 
-                    coverity_passphrase: "${COVERITY_PASSWORD}", 
-                    coverity_stream_name: "${COVERITY_STREAM_NAME}", 
+                script {
+                    def status = security_scan product: 'coverity',
+                    coverity_url: "${COVERITY_URL}",
+                    coverity_user: "${COVERITY_USER_NAME}",
+                    coverity_passphrase: "${COVERITY_PASSWORD}",
+                    coverity_stream_name: "${COVERITY_STREAM_NAME}",
                     coverity_project_name: "${COVERITY_PROJECT_NAME}",
-                    coverity_install_directory: '/opt/cov-analysis-linux64-2024.12.0', 
-                    coverity_local: true
+                    coverity_install_directory: '/opt/cov-analysis-linux64-2024.12.0',
+                    coverity_local: true,
+                    coverity.automation.prcomment: true, 
 
                     // Uncomment to add custom logic based on return status
-                if (status == 8) { unstable 'policy violation' }
+                    if (status == 8) { unstable 'policy violation' }
                 else if (status != 0) { error 'plugin failure' }
-            }
+                }
             }
         }
     }
