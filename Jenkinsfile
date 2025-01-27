@@ -20,7 +20,7 @@ pipeline {
         stage('Coverity Full Scan') {
             when { not { changeRequest() } }
             steps {
-
+                 script {
                 def status = security_scan product: "coverity", 
                     coverity_url: "${COVERITY_URL}", 
                     coverity_user: "${COVERITY_USER_NAME}", 
@@ -35,12 +35,14 @@ pipeline {
                 else if (status != 0) { error 'plugin failure' }
 
 
+            }
 
             }
         }
         stage('Coverity PR Scan') {
             when { changeRequest() }
             steps {
+                 script {
                 def status = security_scan product: "coverity", 
                     coverity_url: "${COVERITY_URL}", 
                     coverity_user: "${COVERITY_USER_NAME}", 
@@ -53,6 +55,7 @@ pipeline {
                     // Uncomment to add custom logic based on return status
                 if (status == 8) { unstable 'policy violation' }
                 else if (status != 0) { error 'plugin failure' }
+            }
             }
         }
     }
