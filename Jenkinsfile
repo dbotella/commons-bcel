@@ -3,6 +3,7 @@
 // https://plugins.jenkins.io/blackduck-security-scan
 
 pipeline {
+    agent any
     environment {
         REPO_NAME = "${env.GIT_URL.tokenize('/.')[-2]}"
         FULLSCAN = "${env.BRANCH_NAME ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
