@@ -10,8 +10,8 @@ pipeline {
         PRSCAN = "${env.CHANGE_TARGET ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
     }
     tools {
-        maven 'maven-3'
-        jdk 'openjdk-21'
+        maven 'maven-3.9'
+        jdk 'openjdk-17'
     }
     stages {
         stage('Build') {
