@@ -6,14 +6,40 @@ pipeline {
     agent any
     environment {
         REPO_NAME = "${env.GIT_URL.tokenize('/.')[-2]}"
-        FULLSCAN = "${env.BRANCH_NAME ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
-        PRSCAN = "${env.CHANGE_TARGET ==~ /^(main|master|develop|stage|release)$/ ? 'true' : 'false'}"
     }
     tools {
         maven 'maven-3.9'
         jdk 'openjdk-17'
     }
     stages {
+        stage('Detect Branch') {
+            steps {
+                script {
+                    // Try multiple methods to get branch name
+                    def branchName = env.BRANCH_NAME
+                    if (!branchName || branchName == 'null') {
+                        branchName = env.GIT_BRANCH ?: sh(
+                            script: 'git rev-parse --abbrev-ref HEAD',
+                            returnStdout: true
+                        ).trim()
+                    }
+                    // Remove origin/ prefix if present
+                    branchName = branchName.replaceAll('^origin/', '')
+                    env.BRANCH_NAME = branchName
+                    
+                    // Set FULLSCAN and PRSCAN flags
+                    def fullScanBranches = ['main', 'master', 'develop', 'stage', 'release']
+                    env.FULLSCAN = fullScanBranches.contains(branchName) ? 'true' : 'false'
+                    
+                    def prTarget = env.CHANGE_TARGET ?: ''
+                    env.PRSCAN = fullScanBranches.contains(prTarget) ? 'true' : 'false'
+                    
+                    echo "Branch detected: ${branchName}"
+                    echo "FULLSCAN: ${env.FULLSCAN}"
+                    echo "PRSCAN: ${env.PRSCAN}"
+                }
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mvn -B -Drat.skip=true -DskipTests=true package'
